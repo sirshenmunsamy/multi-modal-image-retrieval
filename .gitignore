@@ -1,0 +1,16 @@
+# Ignore virtual environments
+venv/
+__pycache__/
+
+# Ignore dataset files
+data/
+*.jpg
+*.png
+
+# Ignore model checkpoints
+*.pt
+*.h5
+
+# Ignore system files
+.DS_Store
+Thumbs.db
