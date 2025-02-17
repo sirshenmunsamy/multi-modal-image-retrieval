@@ -14,3 +14,7 @@ data/
 # Ignore system files
 .DS_Store
 Thumbs.db
+
+# Ignore large data files
+data/embeddings.npy
+data/faiss_index.bin
