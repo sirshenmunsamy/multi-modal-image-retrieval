@@ -9,33 +9,32 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", DEVICE)
 
 # Define dataset folders
-IMAGE_FOLDERS = ["/Users/sirshenmunsamy/Desktop/SB Case Study/data/raw/test_data_v2",
-                 "/Users/sirshenmunsamy/Desktop/SB Case Study/data/raw/train_data"]
+TRAIN_FOLDER = "/Users/sirshenmunsamy/Desktop/SB Case Study/data/raw/train_data"
+TEST_FOLDER = "/Users/sirshenmunsamy/Desktop/SB Case Study/data/raw/test_data_v2"
 
-OUTPUT_FILE = "data/embeddings.npy"
+TRAIN_EMBEDDINGS_FILE = "/Users/sirshenmunsamy/Desktop/SB Case Study/multi-modal-image-retrieval/data/train_embeddings.npy"
+TEST_EMBEDDINGS_FILE = "/Users/sirshenmunsamy/Desktop/SB Case Study/multi-modal-image-retrieval/data/test_embeddings.npy"
 
-def extract_image_embeddings(image_folders, output_file):
-    """ Extracts CLIP embeddings for all images in the dataset. """
+def extract_embeddings(image_folder, output_file):
+    """Extract CLIP embeddings for all images in the dataset."""
     image_embeddings = []
     image_paths = []
 
-    for folder in image_folders:
-        print(f"📂 Processing images in {folder}...")
+    print(f"📂 Processing images in {image_folder}...")
 
-        for img_name in os.listdir(folder):
-            img_path = os.path.join(folder, img_name)
+    for img_name in os.listdir(image_folder):
+        img_path = os.path.join(image_folder, img_name)
 
-            try:
-                image = preprocess(Image.open(img_path)).unsqueeze(0).to(DEVICE)
-                with torch.no_grad():
-                    embedding = model.encode_image(image).cpu().numpy()
-                image_embeddings.append(embedding)
-                image_paths.append(img_path)
+        try:
+            image = preprocess(Image.open(img_path)).unsqueeze(0).to(DEVICE)
+            with torch.no_grad():
+                embedding = model.encode_image(image).cpu().numpy()
+            image_embeddings.append(embedding)
+            image_paths.append(img_path)
 
-            except Exception as e:
-                print(f"❌ Error processing {img_name}: {e}")
+        except Exception as e:
+            print(f"❌ Error processing {img_name}: {e}")
 
-    # Convert to NumPy and save
     if image_embeddings:
         image_embeddings = np.vstack(image_embeddings)
         np.save(output_file, {"embeddings": image_embeddings, "paths": image_paths})
@@ -44,4 +43,5 @@ def extract_image_embeddings(image_folders, output_file):
         print("⚠ No images processed. Check dataset paths.")
 
 if __name__ == "__main__":
-    extract_image_embeddings(IMAGE_FOLDERS, OUTPUT_FILE)
+    extract_embeddings(TRAIN_FOLDER, TRAIN_EMBEDDINGS_FILE)
+    extract_embeddings(TEST_FOLDER, TEST_EMBEDDINGS_FILE)

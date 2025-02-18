@@ -1,61 +1,84 @@
 from fastapi import FastAPI
-import faiss
 import torch
 import clip
 import numpy as np
 from pydantic import BaseModel
-import sys
 import os
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 os.environ["OMP_NUM_THREADS"] = "1"
 
-# Ensure `src/` is in Python's path
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 # Paths
-FAISS_INDEX_FILE = "/Users/sirshenmunsamy/Desktop/SB Case Study/multi-modal-image-retrieval/data/faiss_index.bin"
-EMBEDDINGS_FILE = "/Users/sirshenmunsamy/Desktop/SB Case Study/multi-modal-image-retrieval/data/embeddings.npy"
-
-# Initialize FastAPI
-app = FastAPI()
+TEST_EMBEDDINGS_FILE = "/Users/sirshenmunsamy/Desktop/SB Case Study/multi-modal-image-retrieval/data/test_embeddings.npy"
 
 # Load CLIP Model
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", DEVICE)
 
-# Load FAISS index
-faiss_index = faiss.read_index(FAISS_INDEX_FILE)
+# Load test embeddings
+def load_test_embeddings():
+    """Load test image embeddings & paths."""
+    data = np.load(TEST_EMBEDDINGS_FILE, allow_pickle=True).item()
+    return data["embeddings"], data["paths"]
 
-# Load image paths
-data = np.load(EMBEDDINGS_FILE, allow_pickle=True).item()
-image_paths = data["paths"]
+# Compute nearest neighbors
+def compute_nearest_neighbors(text_query, top_k=10):
+    """Find nearest test images to the query embedding."""
+    test_embeddings, test_image_paths = load_test_embeddings()
 
-# Define a request model
+    # Convert query to an embedding
+    with torch.no_grad():
+        text_tokens = clip.tokenize([text_query]).to(DEVICE)
+        text_embedding = model.encode_text(text_tokens).cpu().numpy()
+
+    # ✅ Normalize embeddings
+    text_embedding = text_embedding / np.linalg.norm(text_embedding)
+    test_embeddings = test_embeddings / np.linalg.norm(test_embeddings, axis=1, keepdims=True)
+
+    # Compute L2 distance
+    distances = np.linalg.norm(test_embeddings - text_embedding, axis=1)
+
+    # Get top-K closest images
+    top_k_indices = np.argsort(distances)[:top_k]
+
+    results = [
+        {
+            "image": f"http://127.0.0.1:8000/data/raw/test_data_v2/{os.path.basename(test_image_paths[idx])}",
+            "distance": float(distances[idx])
+        }
+        for idx in top_k_indices
+    ]
+
+    return results
+# Initialize FastAPI
+app = FastAPI()
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount test images directory
+DATA_DIR = "/Users/sirshenmunsamy/Desktop/SB Case Study/data"
+app.mount("/data", StaticFiles(directory=DATA_DIR, check_dir=True), name="data")
+
+# Define input model
 class QueryRequest(BaseModel):
     text: str
-    top_k: int = 5  # Default to top 5 results
-
-def get_text_embedding(text):
-    """Convert a text query into an embedding using CLIP."""
-    with torch.no_grad():
-        text_tokens = clip.tokenize([text]).to(DEVICE)
-        text_embedding = model.encode_text(text_tokens).cpu().numpy()
-    return text_embedding
+    top_k: int = 10  # Default top_k value
 
 @app.post("/search")
 async def search_images(query: QueryRequest):
-    """Search FAISS for the most relevant images."""
-    text_embedding = get_text_embedding(query.text)
-    
-    distances, indices = faiss_index.search(text_embedding, query.top_k)
-
-    results = [{"image": image_paths[idx], "distance": float(distances[0][i])} for i, idx in enumerate(indices[0])]
-
+    """Use L2 distance to retrieve test images."""
+    results = compute_nearest_neighbors(query.text, query.top_k)
     return {"query": query.text, "results": results}
 
 @app.get("/")
 async def root():
-    """API Root Endpoint."""
+    """Root endpoint."""
     return {"message": "Multi-Modal Image Retrieval API is running!"}
-
