@@ -3,20 +3,16 @@ import clip
 from PIL import Image
 import os
 import numpy as np
+from config_settings import TEST_FOLDER, TEST_EMBEDDINGS_FILE, DEVICE
 
 # Load CLIP model
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", DEVICE)
-
-# Define dataset folders
-TRAIN_FOLDER = "/Users/sirshenmunsamy/Desktop/SB Case Study/data/raw/train_data"
-TEST_FOLDER = "/Users/sirshenmunsamy/Desktop/SB Case Study/data/raw/test_data_v2"
-
-TRAIN_EMBEDDINGS_FILE = "/Users/sirshenmunsamy/Desktop/SB Case Study/multi-modal-image-retrieval/data/train_embeddings.npy"
-TEST_EMBEDDINGS_FILE = "/Users/sirshenmunsamy/Desktop/SB Case Study/multi-modal-image-retrieval/data/test_embeddings.npy"
 
 def extract_embeddings(image_folder, output_file):
     """Extract CLIP embeddings for all images in the dataset."""
+    if not os.path.exists(image_folder):
+        raise FileNotFoundError(f"❌ Error: Folder {image_folder} does not exist.")
+
     image_embeddings = []
     image_paths = []
 
@@ -43,5 +39,4 @@ def extract_embeddings(image_folder, output_file):
         print("⚠ No images processed. Check dataset paths.")
 
 if __name__ == "__main__":
-    extract_embeddings(TRAIN_FOLDER, TRAIN_EMBEDDINGS_FILE)
     extract_embeddings(TEST_FOLDER, TEST_EMBEDDINGS_FILE)
