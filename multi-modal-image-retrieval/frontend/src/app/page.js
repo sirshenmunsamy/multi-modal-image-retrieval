@@ -64,10 +64,10 @@ export default function Home() {
           {results.map((result, index) => (
             <div key={index} className="bg-gray-800 p-4 rounded-lg">
               <img
-                src={result.image} // ✅ Backend now returns the correct image URL
-                alt="Retrieved result"
-                className="w-full h-40 object-cover rounded-lg"
-              />
+  src={result.image}
+  alt="Retrieved result"
+  className="w-full h-40 object-contain rounded-lg"
+/>
               <p className="mt-2 text-sm text-gray-400">Distance: {result.distance.toFixed(2)}</p>
             </div>
           ))}
