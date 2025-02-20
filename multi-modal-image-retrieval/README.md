@@ -2,7 +2,7 @@
 
 This project implements a **multi-modal image retrieval system** using **CLIP** for embedding extraction and **L2 distance** for searching the most relevant images based on a text query.
 
-## 📌 Features
+## Features
 - Extracts **image embeddings** using OpenAI's CLIP model.
 - Stores **test image embeddings** for efficient retrieval.
 - Uses **L2 distance** to find the most similar images to a given text query.
@@ -11,27 +11,27 @@ This project implements a **multi-modal image retrieval system** using **CLIP** 
 
 ---
 
-## 🛠 Installation & Setup
+## Installation & Setup
 
-### 1️⃣ Clone the Repository
+### Clone the Repository
 ```bash
 git clone https://github.com/your-repo/multi-modal-image-retrieval.git
 cd multi-modal-image-retrieval
 ```
 
-### 2️⃣ Create & Activate Virtual Environment
+###  Create & Activate Virtual Environment
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # macOS/Linux
 venv\Scripts\activate     # Windows
 ```
 
-### 3️⃣ Install Dependencies
+### Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Download & Prepare Dataset
+### Download & Prepare Dataset
 Ensure that your test images are stored in:
 ```
 multi-modal-image-retrieval/data/raw/test_data_v2
@@ -40,21 +40,21 @@ If your dataset is in a different location, update the `config_settings.py` file
 
 ---
 
-## 🔥 Running the System
+## Running the System
 
-### 1️⃣ Extract Image Embeddings
+### Extract Image Embeddings
 ```bash
 python src/feature_extractor.py
 ```
 This generates `test_embeddings.npy` in `multi-modal-image-retrieval/data`.
 
-### 2️⃣ Start the Backend API (FastAPI)
+### Start the Backend API (FastAPI)
 ```bash
 uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
 ```
 The API will be available at: **[http://127.0.0.1:8000](http://127.0.0.1:8000)**.
 
-### 3️⃣ Start the Frontend (Next.js)
+### Start the Frontend (Next.js)
 ```bash
 cd frontend
 npm install  # Only required for the first time
@@ -64,7 +64,7 @@ The frontend will be available at: **[http://localhost:3000](http://localhost:30
 
 ---
 
-## 🔎 API Usage
+## API Usage
 
 ### Search for Images using Text Query
 #### **Endpoint:** `POST /search`
@@ -94,7 +94,7 @@ The frontend will be available at: **[http://localhost:3000](http://localhost:30
 
 ---
 
-## 🛠 Configuration
+## Configuration
 Modify `config_settings.py` to update paths:
 ```python
 # Paths
@@ -105,8 +105,8 @@ TEST_EMBEDDINGS_FILE = os.path.join(DATA_DIR, "test_embeddings.npy")
 
 ---
 
-## 🚀 Troubleshooting
-### 🚫 Backend Not Starting?
+## Troubleshooting
+### Backend Not Starting?
 - Check if the embeddings exist:
   ```bash
   ls multi-modal-image-retrieval/data/test_embeddings.npy
@@ -121,16 +121,12 @@ TEST_EMBEDDINGS_FILE = os.path.join(DATA_DIR, "test_embeddings.npy")
   uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
   ```
 
-### 🚫 Frontend Not Displaying Images?
+### Frontend Not Displaying Images?
 - Check the API response in the browser at `http://127.0.0.1:8000/search`.
 - Ensure CORS is enabled in `api.py`.
 - Check if images exist in `multi-modal-image-retrieval/data/raw/test_data_v2`.
 
 ---
 
-## 🐝 License
-MIT License. Free to use and modify.
-
----
-🔥 **Developed by:** _[Sirshen_  
+**Developed by:** _[Sirshen_  
 
