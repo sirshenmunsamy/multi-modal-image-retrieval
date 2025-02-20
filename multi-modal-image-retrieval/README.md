@@ -1,13 +1,13 @@
 # Multi-Modal Image Retrieval System
 
-This project implements a **multi-modal image retrieval system** using **CLIP** for embedding extraction and **L2 distance** for searching the most relevant images based on a text query.
+This project implements a multi-modal image retrieval system using CLIP for embedding extraction and L2 distance for searching the most relevant images based on a text query.
 
 ## Features
-- Extracts **image embeddings** using OpenAI's CLIP model.
-- Stores **test image embeddings** for efficient retrieval.
-- Uses **L2 distance** to find the most similar images to a given text query.
-- Provides a **FastAPI backend** for querying.
-- A **Next.js frontend** to interact with the system.
+- Extracts image embeddings using OpenAI's CLIP model.
+- Stores test image embeddings for efficient retrieval.
+- Uses L2 distance to find the most similar images to a given text query.
+- Provides a FastAPI backend for querying.
+- A Next.js frontend to interact with the system.
 
 ---
 
@@ -52,7 +52,7 @@ This generates `test_embeddings.npy` in `multi-modal-image-retrieval/data`.
 ```bash
 uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
 ```
-The API will be available at: **[http://127.0.0.1:8000](http://127.0.0.1:8000)**.
+The API will be available at: [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 ### Start the Frontend (Next.js)
 ```bash
@@ -60,22 +60,22 @@ cd frontend
 npm install  # Only required for the first time
 npm run dev
 ```
-The frontend will be available at: **[http://localhost:3000](http://localhost:3000)**.
+The frontend will be available at: [http://localhost:3000](http://localhost:3000).
 
 ---
 
 ## API Usage
 
 ### Search for Images using Text Query
-#### **Endpoint:** `POST /search`
-#### **Request Body:**
+#### Endpoint: `POST /search`
+#### Request Body:
 ```json
 {
   "text": "cat",
   "top_k": 5
 }
 ```
-#### **Response:**
+#### Response:
 ```json
 {
   "query": "cat",
@@ -111,7 +111,7 @@ TEST_EMBEDDINGS_FILE = os.path.join(DATA_DIR, "test_embeddings.npy")
   ```bash
   ls multi-modal-image-retrieval/data/test_embeddings.npy
   ```
-  If missing, **run the feature extractor**:  
+  If missing, run the feature extractor:  
   ```bash
   python src/feature_extractor.py
   ```
@@ -128,5 +128,5 @@ TEST_EMBEDDINGS_FILE = os.path.join(DATA_DIR, "test_embeddings.npy")
 
 ---
 
-**Developed by:** _[Sirshen_  
+Developed by: _[Sirshen_  
 
